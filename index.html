@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>فريم ستوديو — مونتاج فريم بفريم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top glass">
+  <h1>فريم<span class="logo-dot"></span>ستوديو</h1>
+  <nav id="steps">
+    <button data-step="upload" class="on">١ رفع</button>
+    <button data-step="frames">٢ فريمات</button>
+    <button data-step="ai">٣ ذكاء</button>
+    <button data-step="editor">٤ محرر</button>
+    <button data-step="export">٥ تصدير</button>
+    <button data-step="projects">٦ مشاريعي</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ١ رفع -->
+  <section id="s-upload" class="step on">
+    <label id="drop" class="glass drop" tabindex="0">
+      <input type="file" id="file" accept="video/mp4,video/webm,video/quicktime" hidden>
+      <strong>اسحب الفيديو هنا أو اضغط للاختيار</strong>
+      <small>mp4 · webm · mov — يُفضّل أقل من 100 ميجا</small>
+    </label>
+    <div id="upload-panel" class="glass panel" hidden>
+      <video id="preview" controls playsinline></video>
+      <div class="grid">
+        <label>فريمات في الثانية: <b id="fps-v">5</b>
+          <input type="range" id="fps" min="1" max="30" value="5"></label>
+        <label>أقصى ارتفاع للفريم
+          <select id="max-h"><option value="480">480p</option><option value="720" selected>720p</option><option value="1080">1080p</option></select></label>
+        <label>من ثانية <input type="number" id="t-from" min="0" step="0.1" value="0"></label>
+        <label>إلى ثانية <input type="number" id="t-to" min="0" step="0.1"></label>
+      </div>
+      <p id="estimate" class="hint"></p>
+      <button class="btn" id="go-extract">استخرج الفريمات والصوت</button>
+    </div>
+  </section>
+
+  <!-- ٢ فريمات -->
+  <section id="s-frames" class="step">
+    <div class="glass panel">
+      <div class="bar"><div id="bar-extract"></div></div>
+      <p id="status-extract" class="hint">ارفع فيديو أولاً.</p>
+      <div id="strip" class="strip"></div>
+      <img id="big" class="big" alt="" hidden>
+    </div>
+  </section>
+
+  <!-- ٣ ذكاء (وحدة جاهزة للربط: js/ai.js) -->
+  <section id="s-ai" class="step">
+    <div class="glass panel">
+      <button class="btn" id="run-ai">حلّل الصوت والفريمات</button>
+      <p id="ai-out" class="hint">لم يبدأ التحليل بعد.</p>
+    </div>
+  </section>
+
+  <!-- ٤ محرر (js/editor.js) -->
+  <section id="s-editor" class="step">
+    <div class="glass panel">
+      <p id="ed-empty" class="hint">استخرج الفريمات الأول عشان تقدر تعدّل.</p>
+      <div id="ed-body" hidden>
+        <canvas id="ed-canvas" class="big" aria-label="معاينة الفريم — اضغط لتحديد مكان النص"></canvas>
+        <div class="row">
+          <button class="mini" id="ed-prev" aria-label="الفريم السابق">السابق</button>
+          <input id="ed-slider" type="range" min="1" max="1" value="1" aria-label="اختيار الفريم" style="flex:1">
+          <button class="mini" id="ed-next" aria-label="الفريم التالي">التالي</button>
+          <b id="ed-pos"></b>
+        </div>
+        <p class="hint">اضغط على الصورة لتحديد مكان النص (الخط المنقّط).</p>
+        <div class="grid">
+          <input id="ed-text" placeholder="النص">
+          <label>لون <input id="ed-color" type="color" value="#ffffff"></label>
+          <label>الحجم <input id="ed-size" type="range" min="3" max="15" value="7"></label>
+          <label>فريم رقم <input id="ed-frame" type="number" min="1"></label>
+          <label><input type="checkbox" id="ed-all"> على كل الفريمات</label>
+          <button class="btn" id="ed-add">أضف النص</button>
+        </div>
+        <div class="row">
+          <button class="mini" id="ed-subs">ترجمة تلقائية من الكلام المنطوق</button>
+          <button class="mini" id="ed-clear">امسح طبقات الفريم</button>
+        </div>
+        <ul id="ed-layers" class="layers"></ul>
+        <p id="ed-info" class="hint"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ٥ تصدير -->
+  <section id="s-export" class="step">
+    <div class="glass panel">
+      <div class="grid">
+        <label>الدقة
+          <select id="ex-res"><option value="720">720p</option><option value="1080">1080p</option></select></label>
+        <label>الجودة
+          <select id="ex-crf"><option value="28">عادية</option><option value="23" selected>جيدة</option><option value="18">عالية</option></select></label>
+        <label>FPS <input type="number" id="ex-fps" min="1" max="30"></label>
+        <label><input type="checkbox" id="ex-audio" checked> الصوت الأصلي</label>
+      </div>
+      <button class="btn" id="go-export">اجمّع الفيديو</button>
+      <div class="bar"><div id="bar-export"></div></div>
+      <p id="status-export" class="hint"></p>
+      <video id="out" controls playsinline hidden></video>
+      <a id="dl" class="btn" download="framestudio.mp4" hidden>تحميل الفيديو</a>
+    </div>
+  </section>
+
+  <!-- ٦ مشاريع (js/supabase.js) -->
+  <section id="s-projects" class="step">
+    <div class="glass panel">
+      <div id="auth-box" class="grid">
+        <input id="em" type="email" placeholder="الإيميل" autocomplete="email">
+        <input id="pw" type="password" placeholder="كلمة السر (6+ حروف)" autocomplete="current-password">
+        <button class="btn" id="login">دخول / تسجيل</button>
+      </div>
+      <div id="user-box" hidden>
+        <div class="row"><span class="hint">مسجّل بـ <b id="user-mail"></b></span><button class="mini" id="logout">خروج</button></div>
+        <div class="grid">
+          <input id="proj-name" placeholder="اسم المشروع">
+          <button class="btn" id="save-proj">احفظ المشروع الحالي</button>
+        </div>
+      </div>
+      <div id="proj-list" class="cards"></div>
+    </div>
+  </section>
+</main>
+<div id="toast" role="status"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
